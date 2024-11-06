@@ -1,0 +1,53 @@
+from collections import deque
+
+# A class to represent a graph object
+class Graph:
+    # Constructor
+    def __init__(self, edges, n):
+        # Initialize adjacency list for the graph
+        self.adjList = [[] for _ in range(n)]
+        # Add edges to the undirected graph
+        for (src, dest) in edges:
+            self.adjList[src].append(dest)
+            self.adjList[dest].append(src)
+
+    # Function to perform BFS iteratively on the graph
+    def bfs(self, start, discovered):
+        q = deque([start])  # Start BFS from the given node
+        discovered[start] = True  # Mark the start node as discovered
+
+        while q:
+            v = q.popleft()  # Dequeue front node
+            print(v, end=' ')  # Process the node (print it)
+
+            # Explore all neighbors of the current node
+            for u in self.adjList[v]:
+                if not discovered[u]:
+                    discovered[u] = True  # Mark as discovered
+                    q.append(u)  # Enqueue the neighbor
+
+if __name__ == '__main__':
+    # List of graph edges as per the input
+    edges = []
+    num_edges = int(input("Enter the number of edges: "))  # Total number of edges
+    print("Enter edges as pairs of nodes (src dest):")
+    
+    # Collect edges from user input
+    for _ in range(num_edges):
+        src, dest = map(int, input().split())  # Read each edge as a pair of integers
+        edges.append((src, dest))
+
+    # Total number of nodes in the graph
+    n = int(input("Enter the number of nodes (n): "))
+
+    # Build a graph from the given edges
+    graph = Graph(edges, n)
+
+    # Perform BFS starting from each undiscovered node
+    print("\nFollowing is the Breadth-First Traversal: ")
+    discovered = [False] * n  # Keep track of discovered nodes
+
+    # Perform BFS for each undiscovered node (handle disconnected graph)
+    for i in range(n):
+        if not discovered[i]:
+            graph.bfs(i, discovered)

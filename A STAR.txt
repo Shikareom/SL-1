@@ -1,0 +1,107 @@
+class Node:
+    def __init__(self, data, level, fval):
+        self.data = data  # Current puzzle configuration
+        self.level = level  # Depth of the node (how many moves to reach it)
+        self.fval = fval  # f(x) = g(x) + h(x)
+
+    def generate_child(self):
+        # Find the blank space and generate child nodes
+        x, y = self.find(self.data, '_')
+        val_list = [[x, y - 1], [x, y + 1], [x - 1, y], [x + 1, y]]  # Directions: up, down, left, right
+        children = []
+        for i in val_list:
+            child = self.shuffle(self.data, x, y, i[0], i[1])
+            if child is not None:
+                child_node = Node(child, self.level + 1, 0)
+                children.append(child_node)
+        return children
+
+    def shuffle(self, puz, x1, y1, x2, y2):
+        # Swap the blank space with the adjacent tile
+        if 0 <= x2 < len(self.data) and 0 <= y2 < len(self.data):
+            temp_puz = self.copy(puz)
+            temp = temp_puz[x2][y2]
+            temp_puz[x2][y2] = temp_puz[x1][y1]
+            temp_puz[x1][y1] = temp
+            return temp_puz
+        else:
+            return None
+
+    def copy(self, root):
+        # Copy the puzzle matrix
+        return [row[:] for row in root]
+
+    def find(self, puz, x):
+        # Find the position of the blank space
+        for i in range(len(puz)):
+            for j in range(len(puz)):
+                if puz[i][j] == x:
+                    return i, j
+
+
+class Puzzle:
+    def __init__(self, size):
+        self.n = size
+        self.open = []
+        self.closed = []
+
+    def accept(self):
+        # Accept puzzle configuration from the user
+        puz = []
+        for i in range(self.n):
+            temp = input().split(" ")
+            puz.append(temp)
+        return puz
+
+    def f(self, start, goal):
+        # Calculate f(x) = h(x) + g(x)
+        return self.h(start.data, goal) + start.level
+
+    def h(self, start, goal):
+        # Heuristic function: number of misplaced tiles
+        temp = 0
+        for i in range(self.n):
+            for j in range(self.n):
+                if start[i][j] != goal[i][j] and start[i][j] != '_':
+                    temp += 1
+        return temp
+
+    def process(self):
+        # Accept start and goal configurations and run the A* algorithm
+        print("Enter the start state matrix:")
+        start = self.accept()
+        print("Enter the goal state matrix:")
+        goal = self.accept()
+
+        start = Node(start, 0, 0)
+        start.fval = self.f(start, goal)
+        self.open.append(start)
+
+        while True:
+            # Sort open list by f-value (ascending)
+            self.open.sort(key=lambda x: x.fval, reverse=False)
+            cur = self.open[0]
+
+            # Print current puzzle state
+            print("\nCurrent state:")
+            for row in cur.data:
+                print(" ".join(row))
+
+            # If goal state is reached
+            if self.h(cur.data, goal) == 0:
+                print("\nGoal state reached!")
+                break
+
+            # Generate child nodes and add to open list
+            for i in cur.generate_child():
+                i.fval = self.f(i, goal)
+                self.open.append(i)
+
+            # Move the current node to closed list
+            self.closed.append(cur)
+            self.open.pop(0)  # Remove the first element in the open list
+
+
+# Create a puzzle object with size 3 (for a 3x3 puzzle)
+puz = Puzzle(3)
+puz.process()

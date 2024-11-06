@@ -1,0 +1,94 @@
+public class NQueenProblem {
+    // Size of the board (NxN)
+    final int N = 4;
+
+    // A utility function to print the solution
+    void printSolution(int board[][]) {
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                System.out.print(board[i][j] + " "); // 1 represents queen placement, 0 represents empty
+            }
+            System.out.println(); // New line after each row
+        }
+    }
+
+    // A utility function to check if a queen can be safely placed on board[row][col]
+    // This function checks for conflicts on the left side of the current queen
+    boolean isSafe(int board[][], int row, int col) {
+        int i, j;
+
+        // Check this row on the left side
+        for (i = 0; i < col; i++) {
+            if (board[row][i] == 1) {
+                return false; // Queen already placed in this row
+            }
+        }
+
+        // Check upper diagonal on the left side
+        for (i = row, j = col; i >= 0 && j >= 0; i--, j--) {
+            if (board[i][j] == 1) {
+                return false; // Queen already placed in upper diagonal
+            }
+        }
+
+        // Check lower diagonal on the left side
+        for (i = row, j = col; j >= 0 && i < N; i++, j--) {
+            if (board[i][j] == 1) {
+                return false; // Queen already placed in lower diagonal
+            }
+        }
+
+        return true; // No conflicts, it's safe to place the queen
+    }
+
+    // A recursive utility function to solve N Queens problem
+    boolean solveNQUtil(int board[][], int col) {
+        // Base case: If all queens are placed then return true
+        if (col >= N) {
+            return true;
+        }
+
+        // Consider this column and try placing this queen in all rows one by one
+        for (int i = 0; i < N; i++) {
+            // Check if the queen can be placed on board[i][col]
+            if (isSafe(board, i, col)) {
+                // Place this queen in board[i][col]
+                board[i][col] = 1;
+
+                // Recur to place the rest of the queens
+                if (solveNQUtil(board, col + 1)) {
+                    return true; // If placing queen leads to a solution, return true
+                }
+
+                // If placing queen in board[i][col] doesn't lead to a solution, backtrack
+                board[i][col] = 0; // BACKTRACK
+            }
+        }
+
+        // If the queen cannot be placed in any row in this column, return false
+        return false;
+    }
+
+    // This function solves the N Queen problem using Backtracking
+    // It returns false if queens cannot be placed, otherwise returns true and prints the solution
+    boolean solveNQ() {
+        // Initialize the board with all 0s (no queens placed)
+        int board[][] = new int[N][N];
+        
+        // Call the recursive utility function to solve the problem
+        if (solveNQUtil(board, 0) == false) {
+            System.out.print("Solution does not exist");
+            return false;
+        }
+
+        // Print the solution
+        printSolution(board);
+        return true;
+    }
+
+    // Driver program to test the above functions
+    public static void main(String args[]) {
+        NQueenProblem Queen = new NQueenProblem();
+        Queen.solveNQ(); // Call the function to solve the N Queens problem
+    }
+}

@@ -1,0 +1,41 @@
+class Graph:
+    # Constructor
+    def __init__(self, edges, n):
+        self.adjList = [[] for _ in range(n)]  # Initialize adjacency list for all nodes
+        # Add edges to the undirected graph
+        for (src, dest) in edges:
+            self.adjList[src].append(dest)
+            self.adjList[dest].append(src)
+
+# Function to perform DFS recursively on the graph
+def recursive_DFS(graph, v, discovered):
+    discovered[v] = True  # Mark the node as discovered
+    print(v, end=' ')  # Print the current node
+    
+    # Visit all the adjacent nodes that have not been discovered
+    for u in graph.adjList[v]:
+        if not discovered[u]:
+            recursive_DFS(graph, u, discovered)
+
+if __name__ == '__main__':
+    # Accept the number of edges and the edges from user input
+    n = int(input("Enter value of n (number of nodes): "))  # Number of nodes
+    edges = []
+    m = int(input("Enter number of edges: "))  # Number of edges
+
+    print("Enter edges (source destination) one by one:")
+    for _ in range(m):
+        src, dest = map(int, input().split())
+        edges.append((src, dest))
+    
+    # Create the graph from the given edges
+    graph = Graph(edges, n)
+    
+    # To keep track of whether a vertex is discovered or not
+    discovered = [False] * n  # Initially, no node is discovered
+
+    # Perform DFS traversal from all undiscovered nodes
+    print("\nFollowing is Depth First Traversal:")
+    for i in range(n):
+        if not discovered[i]:
+            recursive_DFS(graph, i, discovered)
